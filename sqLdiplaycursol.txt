@@ -1,0 +1,82 @@
+diplay cursor
+-----------------------------------------------------------------------------
+‡@sys setting
+sqlplus supper_user_id/supper_password@'DBseverAddress':'port'/SID as sysdba
+
+‡Agrant
+grant select on V_$SESSION to common_user_id;
+grant select on V_$SQL_PLAN to common_user_id;
+grant select on V_$SQL_PLAN_STATISTICS_ALL to common_user_id;
+grant select on V_$SQL to common_user_id;
+
+‡CtestUser login
+sqlplus common_user_id/common_password@'DBseverAddress':'port'/SID
+
+
+
+‡Bpage set
+set pages 10000
+set lines 200
+set serveroutput off
+alter session set statistics_level=all;
+
+‡Cparams set
+
+var a nchar(2);
+
+var b nchar(3);
+
+execute :a := 'aaa';
+execute :b := 'bbb';
+
+‡D SQL
+
+SELECT /*20201122241*/
+a,
+b
+from table 
+where
+
+a=:a
+and b=:b;
+
+
+‡ESELECT * FROM TABLE(DBMS_XPLAN.DISPLAY_CURSOR(format=>'ALL ALLSTATS LAST ADVANCED' ));
+
+‡Fselect sql_id,sql_text from v$sql where sql_text like '%20201122241%';
+Ëresult
+
+d57h19vbzcnjd																																															
+select sql_id,sql_text from v$sql where sql_text like '%20201122241%'																																	
+																																																		
+c1y9rznyjvazk																																															
+
+
+
+‡GSELECT * FROM TABLE(DBMS_XPLAN.DISPLAY_CURSOR(format=>'ALL ALLSTATS LAST ADVANCED',sql_id=>'c1y9rznyjvazk'));
+
+
+
+-----------------------------------------------------------------------------------------------------------------------
+
+explain
+
+‡@sqlplus common_user_id/common_password@'DBseverAddress':'port'/SID
+
+‡A
+set pages 10000
+set lines 200
+set serveroutput off
+alter session set statistics_level=all;
+
+
+‡B
+EXPLAIN PLAN FOR
+SELECT
+* from  xxxxx
+
+
+
+‡C
+@?/rdbms/admin/utlxpls
+

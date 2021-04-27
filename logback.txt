@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+   <!-- 自定义Converter 父类ch.qos.logback.classic.pattern.ClassicConverter -->
+  <conversionRule conversionWord="processId" converterClass="xxx.xxx.xxx" />
+  <conversionRule conversionWord="userId" converterClass="xxxx.xxx.xx" />
+  <conversionRule conversionWord="sessionId" converterClass="xxx.xxx.xxx" />
+  <conversionRule conversionWord="clientIpAddr" converterClass="xxx.xx.xx.xxx" />
+  <conversionRule conversionWord="traceMessage" converterClass="xxx.xxx.xxx" />
+
+  <!-- info临时变量 -->
+  <property name="APPLICATION_LOG_LEVEL" value="info" />
+  <!-- log出力地址 -->
+  <property name="LOG_DIR" value="c:/logs" />
+  <!-- info & debug & trace log名 -->
+  <property name="INFO_LOG_FILENAME" value="application_info" />
+  <!-- error & warn log名 -->
+  <property name="ERROR_LOG_FILENAME" value="application_error" />
+  <!-- 自定义 log名 -->
+  <property name="QUERY_LOG_FILENAME" value="application_query" />
+  <!-- log formart -->
+  <property name="ENCODER_PATTERN" value="%d{yyyy/MM/dd},%d{HH:mm:ss.SSS},%replace(%property{ejbserver.serverName}){'null',''},%-5level,%processId,%thread,%userId,%sessionId,%clientIpAddr,%traceMessage%n" />
+
+   <!-- info & debug & trace log设定 -->
+  <appender name="infoFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_DIR}/${INFO_LOG_FILENAME}.log</file>
+    <filter class="ch.qos.logback.classic.filter.LevelFilter">
+      <level>error</level>
+      <onMatch>DENY</onMatch>
+    </filter>
+    <filter class="ch.qos.logback.classic.filter.LevelFilter">
+      <level>warn</level>
+      <onMatch>DENY</onMatch>
+    </filter>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_DIR}/${INFO_LOG_FILENAME}_%d{yyyyMMdd}.zip</fileNamePattern>
+    </rollingPolicy>
+    <encoder>
+      <pattern>${ENCODER_PATTERN}</pattern>
+    </encoder>
+  </appender>
+
+   <!-- error & warn log设定 -->
+  <appender name="errorFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_DIR}/${ERROR_LOG_FILENAME}.log</file>
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>warn</level>
+    </filter>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_DIR}/${ERROR_LOG_FILENAME}_%d{yyyyMMdd}.zip</fileNamePattern>
+    </rollingPolicy>
+    <encoder>
+      <pattern>${ENCODER_PATTERN}</pattern>
+    </encoder>
+  </appender>
+
+   <!-- 自定义log設定 -->
+  <appender name="queryFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_DIR}/${QUERY_LOG_FILENAME}.log</file>
+
+    <filter class="ch.qos.logback.classic.filter.LevelFilter">
+      <level>warn</level>
+    </filter>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_DIR}/${QUERY_LOG_FILENAME}_%d{yyyyMMdd}.zip</fileNamePattern>
+    </rollingPolicy>
+    <encoder>
+      <pattern>${ENCODER_PATTERN}</pattern>
+    </encoder>
+  </appender>
+
+   <!-- console 设定-->
+  <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>${ENCODER_PATTERN}</pattern>
+    </encoder>
+  </appender>
+
+  <logger name="xxx.xxx.xxx" level="${APPLICATION_LOG_LEVEL}"/>
+  <!-- SQL entity包 log-->
+  <logger name="jp.go.immi_moj.feis02.hk.entity" level="debug"/>
+   <!--自定义log -->
+  <logger name="query"  additivity="false" level="info">
+    <appender-ref ref="queryFile"/>
+  </logger>
+
+  <root level="error">
+    <appender-ref ref="stdout"/>
+    <appender-ref ref="infoFile"/>
+    <appender-ref ref="errorFile"/>
+  </root>
+</configuration>
+
+
+------------------------------------------------------------
+log出力信息自定义
+可利用aop 继承父类 CustomizableTraceInterceptor 来自定义log
+
+
+

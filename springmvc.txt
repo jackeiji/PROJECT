@@ -1,0 +1,355 @@
+web.xml
+-------------------------------------------------------------------------------------------------------------------
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+
+    <context-param>
+        <param-name>spring.profiles.active</param-name>
+        <param-value>product</param-value>
+    </context-param>
+    <context-param>
+        <param-name>spring.profiles.default</param-name>
+        <param-value>product</param-value>
+    </context-param>
+    <context-param>
+      <param-name>defaultHtmlEscape</param-name>
+      <param-value>true</param-value>
+    </context-param>
+    <!-- MvcConfig/applicationContext -->
+    <servlet>
+        <servlet-name>dispatcherServlet</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+         <!-- mvc子容器注解式配置 -->
+            <param-name>contextClass</param-name>
+            <param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
+        </init-param>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>xxxx.xxxxx.xxxxx.MvcConfig</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+        <multipart-config>
+          <max-file-size>104857600</max-file-size>
+          <max-request-size>115343360</max-request-size>
+          <file-size-threshold>104857600</file-size-threshold>
+        </multipart-config>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>dispatcherServlet</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
+	 <!-- spring父容器 -->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>/WEB-INF/applicationContext_xxx.xml,/WEB-INF/applicationContext_xxx.xml</param-value>
+    </context-param>
+
+    <!-- listener設定 -->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    <listener>
+        <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+    </listener>
+
+    <!-- Encod設定 -->
+    <filter>
+        <filter-name>characterEncodingFilter</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>forceEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+    <filter>
+    <filter-name>springSecurityFilterChain</filter-name>
+    <filter-class>
+            org.springframework.web.filter.DelegatingFilterProxy
+        </filter-class>
+  </filter>
+    <filter-mapping>
+        <filter-name>characterEncodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <filter>
+       <filter-name>MultipartFilter</filter-name>
+       <filter-class>org.springframework.web.multipart.support.MultipartFilter</filter-class>
+       <async-supported>true</async-supported>
+    </filter>
+  <filter-mapping>
+      <filter-name>MultipartFilter</filter-name>
+      <url-pattern>/*</url-pattern>
+   </filter-mapping>
+   <filter-mapping>
+    <filter-name>springSecurityFilterChain</filter-name>
+    <url-pattern>/*</url-pattern>
+    <dispatcher>FORWARD</dispatcher>
+    <dispatcher>INCLUDE</dispatcher>
+    <dispatcher>REQUEST</dispatcher>
+    <dispatcher>ASYNC</dispatcher>
+    <dispatcher>ERROR</dispatcher>
+  </filter-mapping>
+   <session-config>
+    <session-timeout>30</session-timeout>
+    <cookie-config>
+      <http-only>true</http-only>
+    </cookie-config>
+    <tracking-mode>COOKIE</tracking-mode>
+  </session-config>
+    <!-- ???面跳? -->
+    <error-page>
+        <error-code>404</error-code>
+        <location>/html/SystemError.html</location>
+    </error-page>
+     <error-page>
+        <error-code>500</error-code>
+        <location>/html/SystemError.html</location>
+    </error-page>
+</web-app>
+
+
+
+
+
+
+----------------------spring contextConfig-------------------------------
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:jee="http://www.springframework.org/schema/jee"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+        http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-4.0.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+       <!--dataSource-->
+       <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>
+    
+        <property name="url" value="jdbc:oracle:thin:@localhost:1521:'sid'" />
+           <property name="username" value="xxxxx" />
+           <property name="password" value="xxxxx" />
+      </bean>
+      
+     <!--注解式事务开启-->
+      <tx:annotation-driven transaction-manager="transactionManager"/>
+      <!--cglib Aop开启-->
+      <aop:aspectj-autoproxy />
+      <!--国际化消息配置-->
+      <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+        <property name="basenames">
+            <list>
+                <value>messages</value>
+                <value>PlaceHolder</value>
+            </list>
+        </property>
+        <property name="defaultEncoding" value="UTF-8"/>
+    </bean>
+    
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="mapperLocations" value="classpath*:mapper/**/*.xml" />
+    </bean>
+      
+      
+      
+</beans>
+
+-------------------------------sringmvc contextConfig-------------------------------------
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:sec="http://www.springframework.org/schema/security"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:jee="http://www.springframework.org/schema/jee"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+        http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-4.0.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+        http://www.springframework.org/schema/security
+        http://www.springframework.org/schema/security/spring-security.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd">
+
+    <!-- 扫描 自动注入@server,@controller,@componet类 -->
+    <context:component-scan base-package="xxxx.xxxx.xxxx.xxx" />
+
+    <!--  扫描包 有ontext:component-scan可省略-->
+    <context:annotation-config />
+    
+	 <!-- 开启Controller注解 -->
+    <mvc:annotation-driven/>
+
+    <!-- Thymeleaf的設定 -->
+    <bean id="templateResolver" class="org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver">
+        <property name="prefix" value="/WEB-INF/pages/" />
+        <property name="suffix" value=".html" />
+        <property name="cacheable" value="false"/>
+        <property name="templateMode" value="HTML5" />
+        <property name="characterEncoding" value="UTF-8" />
+    </bean>
+
+    <bean id="templateEngine" class="org.thymeleaf.spring5.SpringTemplateEngine">
+        <property name="templateResolver" ref="templateResolver" />
+         <property name="additionalDialects">
+            <set>
+                <bean class="org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect"/>
+            </set>
+        </property>
+    </bean>
+
+    <bean class="org.thymeleaf.spring5.view.ThymeleafViewResolver">
+        <property name="templateEngine" ref="templateEngine" />
+
+
+    <!--静态资源配置 -->
+    <mvc:resources mapping="/css/**" location="/css/" />
+    <mvc:resources mapping="/js/**" location="/js/" />
+    <mvc:resources mapping="/img/**" location="/img/" />
+    <mvc:resources mapping="/html/**" location="/html/" />
+
+</beans>
+
+---------------------------------------------security contextConfig-------------------------------------
+
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:sec="http://www.springframework.org/schema/security"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:jee="http://www.springframework.org/schema/jee"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+        http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-4.0.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+        http://www.springframework.org/schema/security
+        http://www.springframework.org/schema/security/spring-security.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd">
+
+    <!--放行静态支援不走过滤器 -->
+    <sec:http pattern="/css/**" security="none"/>
+    <sec:http pattern="/img/**" security="none"/>
+    <sec:http pattern="/js/**" security="none"/>
+    <sec:http pattern="/html/**" security="none"/>
+
+	<!--自定义用户验证配置  auto-config要把设置成"false" -->
+    <sec:http auto-config="false"  entry-point-ref="authenticationEntryPoint">
+     <sec:custom-filter ref="loginAuthenticationFilter" position="FORM_LOGIN_FILTER" />
+        <!-- 
+        默认用户验证配置
+        <sec:form-login login-page="/xxxx/view"
+                        login-processing-url="/xxxx/login"
+                        default-target-url="/xxxxx/view"
+        /> -->
+        <sec:intercept-url pattern="/xxxx/view" access="permitAll" />
+        <sec:intercept-url pattern="/xxxxxx/**" access="permitAll" />
+        <sec:intercept-url pattern="/**" access="isAuthenticated()" />
+        <sec:access-denied-handler ref="accessDeniedHandler"/>
+        <sec:logout  logout-url="/logout" success-handler-ref="logOutHandler" />
+        <sec:session-management />
+    </sec:http>
+
+      <!--自定验证过滤器 UsernamePasswordAuthenticationFilter -->
+    <bean id="loginAuthenticationFilter" class="xxxx.xxx.xxx.Filiter" >
+      <property name="authenticationSuccessHandler" ref="authenticationSuccessHandler"></property>
+      <property name="authenticationFailureHandler" ref="authenticationFailureHandler"></property>
+      <property name="authenticationManager"  ref="webSecurity"></property>
+      <property name="filterProcessesUrl" value="/login"></property>
+    </bean>
+
+      <!-- provider主要写验证逻辑 AbstractUserDetailsAuthenticationProvider -->
+    <bean id="xxAuthenticationprovider" class="xxxx.xxxx.xxx.xxLoginAuthenticationProvider" >
+      <property name="passwordEncoder" ref="passwordEncoder"></property>
+      <property name="userDetailsService" ref="userDetailsService"></property>
+      <property name="messageSource" ref="messageSource"></property>
+    </bean>
+
+  <!-- 登录用户查询service UserDetailsService-->
+    <bean id="userDetailsService" class="xxxxx.xxxx.xxx.xxLoginUserDetailsService">
+    </bean>
+
+  <!--验证成功处理器 SimpleUrlAuthenticationSuccessHandler -->
+  <bean id="authenticationSuccessHandler" class="xxxx.xxx.xxx.xxAuthenticationSuccessHandler">
+    <property name="defaultTargetUrl"  value="/xxxxx/xxx"></property>
+  </bean>
+
+ <!-- 验证失败处理器 SimpleUrlAuthenticationFailureHandler -->
+  <bean id="authenticationFailureHandler" class="xxx.xxx.xxx.xxKAuthenticationFailureHandler" >
+     <property name="defaultFailureUrl" value="/xxxx/view" />
+  </bean>
+
+  <!-- 登出处理器 SimpleUrlLogoutSuccessHandler -->
+    <bean id="logOutHandler" class=xxx.xxx.xxLogOutSuccessHandler" >
+      <property name="defaultTargetUrl" value="/xxx/view"></property>
+    </bean>
+
+    <!-- password加密 -->
+    <bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder">
+    </bean>
+
+    <bean id="authenticationEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
+    <!-- 登录页面地址暴露-->
+      <constructor-arg value="/xxx/xxxx"></constructor-arg>
+    </bean>
+
+    <!--验证失败回调类-->
+    <bean id="accessDeniedHandler" class="xxx.xxxx.xxAccessDeniedHandler">
+        <property name="deafultErrorPage" value="/xxx/SystemError.html"></property>
+        <!--可自定义验证失败跳转页面 参数是个map-->
+         <property name="exceptionMappings">
+          <props>
+              <prop key="org.springframework.security.web.csrf.InvalidCsrfTokenException">
+                  /html/SystemError.html
+              </prop>
+              <prop key="org.springframework.security.web.csrf.MissingCsrfTokenException">
+                  /xxxx/xxx
+              </prop>
+          </props>
+      </property>
+    </bean>
+
+  <!--验证manager-->
+    <sec:authentication-manager id="webSecurity">
+        <sec:authentication-provider ref="xxAuthenticationprovider" />
+    </sec:authentication-manager>
+
+</beans>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
