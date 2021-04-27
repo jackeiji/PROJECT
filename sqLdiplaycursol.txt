@@ -1,26 +1,26 @@
 diplay cursor
 -----------------------------------------------------------------------------
-‡@sys setting
+//â‘ sys setting
 sqlplus supper_user_id/supper_password@'DBseverAddress':'port'/SID as sysdba
 
-‡Agrant
+//â‘¡grant
 grant select on V_$SESSION to common_user_id;
 grant select on V_$SQL_PLAN to common_user_id;
 grant select on V_$SQL_PLAN_STATISTICS_ALL to common_user_id;
 grant select on V_$SQL to common_user_id;
 
-‡CtestUser login
+//â‘£testUser login
 sqlplus common_user_id/common_password@'DBseverAddress':'port'/SID
 
 
 
-‡Bpage set
+//â‘¢page set
 set pages 10000
 set lines 200
 set serveroutput off
 alter session set statistics_level=all;
 
-‡Cparams set
+//â‘£params set
 
 var a nchar(2);
 
@@ -29,7 +29,7 @@ var b nchar(3);
 execute :a := 'aaa';
 execute :b := 'bbb';
 
-‡D SQL
+//â‘¤ SQL
 
 SELECT /*20201122241*/
 a,
@@ -41,10 +41,10 @@ a=:a
 and b=:b;
 
 
-‡ESELECT * FROM TABLE(DBMS_XPLAN.DISPLAY_CURSOR(format=>'ALL ALLSTATS LAST ADVANCED' ));
+//â‘¥SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY_CURSOR(format=>'ALL ALLSTATS LAST ADVANCED' ));
 
-‡Fselect sql_id,sql_text from v$sql where sql_text like '%20201122241%';
-Ëresult
+//â‘¦select sql_id,sql_text from v$sql where sql_text like '%20201122241%';
+â‡’result
 
 d57h19vbzcnjd																																															
 select sql_id,sql_text from v$sql where sql_text like '%20201122241%'																																	
@@ -53,7 +53,7 @@ c1y9rznyjvazk
 
 
 
-‡GSELECT * FROM TABLE(DBMS_XPLAN.DISPLAY_CURSOR(format=>'ALL ALLSTATS LAST ADVANCED',sql_id=>'c1y9rznyjvazk'));
+//â‘§SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY_CURSOR(format=>'ALL ALLSTATS LAST ADVANCED',sql_id=>'c1y9rznyjvazk'));
 
 
 
@@ -61,22 +61,22 @@ c1y9rznyjvazk
 
 explain
 
-‡@sqlplus common_user_id/common_password@'DBseverAddress':'port'/SID
+//â‘ sqlplus common_user_id/common_password@'DBseverAddress':'port'/SID
 
-‡A
+//â‘¡
 set pages 10000
 set lines 200
 set serveroutput off
 alter session set statistics_level=all;
 
 
-‡B
+//â‘¢
 EXPLAIN PLAN FOR
 SELECT
 * from  xxxxx
 
 
 
-‡C
+//â‘£
 @?/rdbms/admin/utlxpls
 
